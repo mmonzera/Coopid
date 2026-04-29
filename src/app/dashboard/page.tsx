@@ -111,25 +111,27 @@ export default function DashboardPage() {
                 📊 Lihat Laporan
               </button>
             )}
-            <Link
-              href="/dashboard/invitations/new"
-              className="w-full sm:w-auto bg-gradient-primary text-white px-6 py-3 rounded-full text-sm font-bold hover:shadow-glow transition-all duration-300 inline-flex items-center justify-center gap-2 btn-shimmer"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+            {invitations.length > 0 && (
+              <Link
+                href="/dashboard/invitations/new"
+                className="w-full sm:w-auto bg-gradient-primary text-white px-6 py-3 rounded-full text-sm font-bold hover:shadow-glow transition-all duration-300 inline-flex items-center justify-center gap-2 btn-shimmer"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Buat Undangan Baru
-            </Link>
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Buat Undangan Baru
+              </Link>
+            )}
           </div>
         </div>
 
