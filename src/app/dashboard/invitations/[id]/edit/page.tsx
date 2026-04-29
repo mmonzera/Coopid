@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEditorStore } from "@/store/useEditorStore";
 import Link from "next/link";
 import { 
@@ -122,6 +122,7 @@ function SortableItem({ id, label, active, onToggle }: { id: string; label: stri
 
 export default function EditInvitationPage() {
   const params = useParams();
+  const router = useRouter();
   const { appearance, content, setAppearance, setContent } = useEditorStore();
   const [activeMainTab, setActiveMainTab] = useState<EditorTab>("konten");
   const [activeDesainTab, setActiveDesainTab] = useState<DesainTab>("warna");
@@ -130,6 +131,7 @@ export default function EditInvitationPage() {
   const [isLandscape, setIsLandscape] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [slug, setSlug] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -199,7 +201,12 @@ export default function EditInvitationPage() {
       if (!res.ok) throw new Error("Gagal menyimpan undangan");
       
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      setShowConfirmModal(false);
+      
+      // Feedback delay then redirect
+      setTimeout(() => {
+        router.push("/dashboard?success=saved");
+      }, 800);
     } catch (error) {
       console.error("Save error:", error);
       alert("Gagal menyimpan undangan. Silakan coba lagi.");
@@ -558,8 +565,8 @@ export default function EditInvitationPage() {
         {/* Action Footer */}
         <div className="p-6 lg:p-8 border-t border-gray-50 bg-white">
           <Button
-            onClick={handleSave}
-            disabled={saving}
+            onClick={() => setShowConfirmModal(true)}
+            disabled={saving || saved}
             className="w-full h-16 rounded-[2rem] text-sm font-black uppercase tracking-[0.2em] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-pink-500/20 group relative overflow-hidden"
             style={{ background: "linear-gradient(135deg, #FF1C8D, #D41474)" }}
           >
@@ -793,6 +800,40 @@ export default function EditInvitationPage() {
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #F1F1F1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #E5E7EB; }
       `}</style>
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl relative animate-in zoom-in-95 duration-300 border border-gray-100">
+            <div className="w-16 h-16 bg-pink-50 rounded-2xl flex items-center justify-center text-pink-500 mb-6 mx-auto">
+              <Save size={32} />
+            </div>
+            
+            <h2 className="text-2xl font-black text-center text-gray-900 mb-2">Simpan Perubahan?</h2>
+            <p className="text-center text-gray-500 text-sm mb-8 leading-relaxed">
+              Apakah Anda yakin ingin menyimpan perubahan pada desain undangan ini?
+            </p>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={() => setShowConfirmModal(false)}
+                className="py-4 px-6 bg-gray-50 text-gray-500 rounded-2xl text-sm font-bold hover:bg-gray-100 transition-colors"
+              >
+                Batal
+              </button>
+              <button 
+                onClick={handleSave}
+                disabled={saving}
+                className="py-4 px-6 bg-gradient-primary text-white rounded-2xl text-sm font-bold hover:shadow-glow transition-all flex items-center justify-center gap-2"
+              >
+                {saving ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : "Ya, Simpan"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

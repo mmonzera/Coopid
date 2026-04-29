@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { X, ExternalLink } from "lucide-react";
+import { X, ExternalLink, CheckCircle2, Trash2, AlertTriangle } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface Invitation {
   id: string;
@@ -18,8 +19,29 @@ export default function DashboardPage() {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
   const [showReport, setShowReport] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [invitationToDelete, setInvitationToDelete] = useState<Invitation | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
+    if (searchParams.get("success") === "saved") {
+      setShowToast(true);
+      const timer = setTimeout(() => {
+        setShowToast(false);
+        // Clean up URL
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("success");
+        router.replace(`/dashboard?${params.toString()}`);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, router]);
+
+  const fetchInvitations = () => {
+    setLoading(true);
     fetch("/api/invitations")
       .then((res) => res.json())
       .then((data) => {
@@ -27,7 +49,32 @@ export default function DashboardPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchInvitations();
   }, []);
+
+  const handleDelete = async () => {
+    if (!invitationToDelete) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/invitations/${invitationToDelete.id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setInvitations(invitations.filter((i) => i.id !== invitationToDelete.id));
+        setShowDeleteConfirm(false);
+        setInvitationToDelete(null);
+      } else {
+        alert("Gagal menghapus undangan");
+      }
+    } catch (error) {
+      alert("Terjadi kesalahan saat menghapus");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -130,6 +177,19 @@ export default function DashboardPage() {
                 {/* Card Cover */}
                 <div className="h-44 bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-400 relative overflow-hidden shrink-0">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+                  <div className="absolute top-4 right-4">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setInvitationToDelete(inv);
+                        setShowDeleteConfirm(true);
+                      }}
+                      className="w-8 h-8 bg-white/20 backdrop-blur-md border border-white/30 text-white rounded-lg flex items-center justify-center hover:bg-red-500 hover:border-red-500 transition-all duration-300"
+                      title="Hapus Undangan"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                   <div className="absolute bottom-5 left-5 right-5">
                     <h3 className="text-white font-black text-xl truncate mb-1">
                       {inv.title || "Undangan Baru"}
@@ -233,6 +293,61 @@ export default function DashboardPage() {
               className="w-full mt-8 py-3.5 bg-gray-900 text-white rounded-xl text-sm font-bold hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/20"
             >
               Tutup Laporan
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl relative animate-in zoom-in-95 duration-300 border border-gray-100 text-center">
+            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center text-red-500 mb-6 mx-auto border-4 border-white shadow-inner">
+              <AlertTriangle size={40} />
+            </div>
+            
+            <h2 className="text-2xl font-black text-gray-900 mb-2">Hapus Undangan?</h2>
+            <p className="text-gray-500 text-sm mb-8 leading-relaxed px-4">
+              Tindakan ini tidak dapat dibatalkan. Seluruh data tamu dan desain untuk <span className="font-bold text-gray-900">"{invitationToDelete?.title}"</span> akan dihapus permanen.
+            </p>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={() => setShowDeleteConfirm(false)}
+                className="py-4 px-6 bg-gray-50 text-gray-500 rounded-2xl text-sm font-bold hover:bg-gray-100 transition-colors"
+              >
+                Batal
+              </button>
+              <button 
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="py-4 px-6 bg-red-600 text-white rounded-2xl text-sm font-bold hover:bg-red-700 hover:shadow-lg hover:shadow-red-200 transition-all flex items-center justify-center gap-2"
+              >
+                {isDeleting ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : "Ya, Hapus"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Toast */}
+      {showToast && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-gray-800">
+            <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-sm">
+              <CheckCircle2 size={18} />
+            </div>
+            <div>
+              <p className="text-sm font-bold">Berhasil Disimpan!</p>
+              <p className="text-[10px] text-gray-400 font-medium">Undangan pernikahan Anda telah diperbarui.</p>
+            </div>
+            <button 
+              onClick={() => setShowToast(false)}
+              className="ml-4 text-gray-500 hover:text-white transition-colors"
+            >
+              <X size={16} />
             </button>
           </div>
         </div>
