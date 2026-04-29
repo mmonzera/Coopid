@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { X, ExternalLink, CheckCircle2, Trash2, AlertTriangle } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -15,7 +15,7 @@ interface Invitation {
   _count: { guests: number };
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
   const [showReport, setShowReport] = useState(false);
@@ -355,5 +355,20 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-64">
+        <div className="relative">
+          <div className="w-12 h-12 border-4 border-pink-200 rounded-full" />
+          <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin absolute inset-0" />
+        </div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }

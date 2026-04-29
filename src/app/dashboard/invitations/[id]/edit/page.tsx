@@ -487,9 +487,9 @@ export default function EditInvitationPage() {
                   id: "cover",
                   title: "Cover & Utama",
                   fields: [
-                    { label: "Wedding Title", value: content.title || "", key: "title" as const, placeholder: "The Wedding of..." },
-                    { label: "Groom Name", value: content.groomName || "", key: "groomName" as const, placeholder: "Enter groom name" },
-                    { label: "Bride Name", value: content.brideName || "", key: "brideName" as const, placeholder: "Enter bride name" },
+                    { label: "Wedding Title", value: content.title || "", key: "title" as const, placeholder: "The Wedding of...", type: "text" },
+                    { label: "Groom Name", value: content.groomName || "", key: "groomName" as const, placeholder: "Enter groom name", type: "text" },
+                    { label: "Bride Name", value: content.brideName || "", key: "brideName" as const, placeholder: "Enter bride name", type: "text" },
                     { label: "Wedding Date", value: content.date || "", key: "date" as const, placeholder: "YYYY-MM-DD", type: "date" },
                   ]
                 },
@@ -497,20 +497,20 @@ export default function EditInvitationPage() {
                   id: "couple",
                   title: "Mempelai",
                   fields: [
-                    { label: "Groom Full Name", value: content.groomFullName || "", key: "groomFullName" as const, placeholder: "Groom's full name" },
-                    { label: "Groom Parents", value: content.groomParents || "", key: "groomParents" as const, placeholder: "Putra dari Bpk... & Ibu..." },
-                    { label: "Bride Full Name", value: content.brideFullName || "", key: "brideFullName" as const, placeholder: "Bride's full name" },
-                    { label: "Bride Parents", value: content.brideParents || "", key: "brideParents" as const, placeholder: "Putri dari Bpk... & Ibu..." },
+                    { label: "Groom Full Name", value: content.groomFullName || "", key: "groomFullName" as const, placeholder: "Groom's full name", type: "text" },
+                    { label: "Groom Parents", value: content.groomParents || "", key: "groomParents" as const, placeholder: "Putra dari Bpk... & Ibu...", type: "text" },
+                    { label: "Bride Full Name", value: content.brideFullName || "", key: "brideFullName" as const, placeholder: "Bride's full name", type: "text" },
+                    { label: "Bride Parents", value: content.brideParents || "", key: "brideParents" as const, placeholder: "Putri dari Bpk... & Ibu...", type: "text" },
                   ]
                 },
                 {
                   id: "event",
                   title: "Acara & Lokasi",
                   fields: [
-                    { label: "Location Name", value: content.location || "", key: "location" as const, placeholder: "Gedung Pernikahan" },
-                    { label: "Event Time", value: content.time || "", key: "time" as const, placeholder: "08:00 - Selesai" },
-                    { label: "Full Address", value: content.eventAddress || "", key: "eventAddress" as const, placeholder: "Jl. Contoh No 123..." },
-                    { label: "Google Maps URL", value: content.mapUrl || "", key: "mapUrl" as const, placeholder: "https://goo.gl/maps/..." },
+                    { label: "Location Name", value: content.location || "", key: "location" as const, placeholder: "Gedung Pernikahan", type: "text" },
+                    { label: "Event Time", value: content.time || "", key: "time" as const, placeholder: "08:00 - Selesai", type: "text" },
+                    { label: "Full Address", value: content.eventAddress || "", key: "eventAddress" as const, placeholder: "Jl. Contoh No 123...", type: "text" },
+                    { label: "Google Maps URL", value: content.mapUrl || "", key: "mapUrl" as const, placeholder: "https://goo.gl/maps/...", type: "text" },
                   ]
                 },
                 {
