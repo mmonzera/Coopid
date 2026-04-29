@@ -49,7 +49,8 @@ export default function NewInvitationPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto animate-fade-in">
+    <div className="max-w-2xl mx-auto w-full py-12 px-4">
+      <div className="animate-fade-in">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
@@ -164,6 +165,7 @@ export default function NewInvitationPage() {
           Jangan khawatir, semua informasi ini bisa diubah nanti di halaman
           editor setelah undangan dibuat.
         </p>
+      </div>
       </div>
     </div>
   );

@@ -9,10 +9,11 @@ function getUserId(request: Request): string | null {
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   const invitation = await prisma.invitation.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       guests: true,
       galleries: { orderBy: { order: "asc" } },
@@ -45,8 +46,9 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   const userId = getUserId(request);
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -55,7 +57,7 @@ export async function PUT(
   try {
     const body = await request.json();
     const invitation = await prisma.invitation.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title: body.title,
         groomName: body.groomName,
@@ -71,6 +73,8 @@ export async function PUT(
           typeof body.content === "object"
             ? JSON.stringify(body.content)
             : body.content,
+        status: body.status,
+        isMusicEnabled: body.isMusicEnabled,
       },
     });
 
@@ -86,15 +90,16 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   const userId = getUserId(request);
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    await prisma.invitation.delete({ where: { id: params.id } });
+    await prisma.invitation.delete({ where: { id } });
     return NextResponse.json({ message: "Undangan berhasil dihapus" });
   } catch (error) {
     return NextResponse.json(

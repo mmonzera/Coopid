@@ -3,14 +3,15 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { name, attendanceStatus, message } = await request.json();
 
     // Find existing guest or create new one
     const existingGuest = await prisma.guest.findFirst({
-      where: { invitationId: params.id, name },
+      where: { invitationId: id, name },
     });
 
     if (existingGuest) {
@@ -26,7 +27,7 @@ export async function POST(
         name,
         attendanceStatus,
         message: message || null,
-        invitationId: params.id,
+        invitationId: id,
       },
     });
 

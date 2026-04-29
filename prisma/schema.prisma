@@ -30,6 +30,8 @@ model Invitation {
   story     String?
   appearance String   @default("{}")
   content   String   @default("{}")
+  status    String   @default("DRAFT") // DRAFT, PUBLISHED
+  isMusicEnabled Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String
