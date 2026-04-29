@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String       @id @default(cuid())
+  email     String       @unique
+  password  String
+  name      String?
+  role      String       @default("user")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  invitations Invitation[]
+}
+
+model Invitation {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String?
+  groomName String?
+  brideName String?
+  date      DateTime?
+  location  String?
+  time      String?
+  story     String?
+  appearance String   @default("{}")
+  content   String   @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  guests    Guest[]
+  galleries Gallery[]
+  music     Music?
+}
+
+model Guest {
+  id              String   @id @default(cuid())
+  name            String
+  phone           String?
+  attendanceStatus String? @default("pending")
+  message         String?
+  createdAt       DateTime @default(now())
+  invitationId    String
+  invitation      Invitation @relation(fields: [invitationId], references: [id])
+}
+
+model Gallery {
+  id           String   @id @default(cuid())
+  imageUrl     String
+  order        Int      @default(0)
+  caption      String?
+  createdAt    DateTime @default(now())
+  invitationId String
+  invitation   Invitation @relation(fields: [invitationId], references: [id])
+}
+
+model Music {
+  id           String   @id @default(cuid())
+  title        String?
+  url          String
+  type         String   @default("upload")
+  createdAt    DateTime @default(now())
+  invitationId String   @unique
+  invitation   Invitation @relation(fields: [invitationId], references: [id])
+}
